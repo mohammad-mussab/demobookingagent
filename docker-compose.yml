@@ -1,0 +1,38 @@
+services:
+  pipecat-agent:
+    image: rudyimhtpdev/voicebooking_piemo1:latest
+    ports:
+      - "8000:8000"
+    environment:
+      - PORT=8000
+
+    env_file:
+      - .env
+    restart: unless-stopped
+    deploy:
+      resources:
+        limits:
+          memory: 4G
+          cpus: '2.0'
+        reservations:
+          memory: 2G
+          cpus: '1.0'
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+    volumes:
+      - ./logs:/app/logs
+      - /tmp:/tmp
+    ulimits:
+      nofile:
+        soft: 65536
+        hard: 65536
+    networks:
+      - pipecat-network
+
+networks:
+  pipecat-network:
+    driver: bridge
